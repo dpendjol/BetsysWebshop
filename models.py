@@ -2,7 +2,9 @@
 #from peewee import Model, Database, CharField, DecimalField, IntegerField, ForeignKeyField, ManyToManyField, Check
 import peewee
 
-db = peewee.SqliteDatabase("mydatabase.db")
+# In conjunction with the default AutoField behaviour (where deleted record IDs can be reused), 
+# this can lead to subtle bugs. To avoid problems, I recommend that you enable foreign-key constraints
+db = peewee.SqliteDatabase("mydatabase.db", pragmas={'foreign_keys': 1})
 
 class BaseModel(peewee.Model):
     class Meta:
@@ -94,6 +96,12 @@ def create_tables():
         [1, 2, 6],
         [2, 3, 4]
     ]
+    
+    product_tag_data = [
+        [1, 1],
+        [2, 1],
+        [3, 3]
+    ]
 
     for item in product_data:
         Product.create(
@@ -102,7 +110,7 @@ def create_tables():
             price=item[2],
             quantity=item[3]
         )
-    
+
     for item in address_data:
         Address.create(
             street=item[0],
@@ -111,7 +119,7 @@ def create_tables():
             city=item[3],
             country=item[4]
         )
-    
+
     for item in user_data:
         User.create(
             first_name=item[0],
@@ -119,27 +127,32 @@ def create_tables():
             address=item[2],
             billing_address=item[3]
         )
-        
+
     for item in tag_data:
         Tag.create(
             name=item[0]
         )
-        
+
     for item in transaction_data:
         Purchase.create(
             user_id=item[0],
             product_id=item[1],
             quantity=item[2]
         )
-    
+
     for item in user_product_data:
         UserProduct.create(
             user_id=item[0],
             product_id=item[1]
         )
     
-    
+    for item in product_tag_data:
+        ProductTag.create(
+            product_id=item[0],
+            tag_id=item[1]
+        )
+        
+
+
 if __name__ == "__main__":
     create_tables()
-    
-    

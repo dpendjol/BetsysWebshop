@@ -9,20 +9,46 @@ def search(term):
 
 
 def list_user_products(user_id):
-    products_query =  (models.UserProduct.select(models.Product)
-                       .join(models.Product, on=(models.UserProduct.product_id == models.Product.id))
-                       .join(models.User, on=(models.UserProduct.user_id == models.User.id))
-                       .where(models.UserProduct.user_id == user_id)
-                       )
-    return [item for item in products_query.namedtuples()]
+    '''
+    Get a list with products that belongs to a user
+    
+    Arguments:
+    user_id -- integer
+    
+    Returns:
+    list of named tuples Product columns.
+    '''
+    products_query = (models.UserProduct.select(models.Product)
+                      .join(models.Product, on=(models.UserProduct.product_id == models.Product.id))
+                      .join(models.User, on=(models.UserProduct.user_id == models.User.id))
+                      .where(models.UserProduct.user_id == user_id)
+                      )
+    return [item for item in products_query.dicts()]
 
 
 def list_products_per_tag(tag_id):
-    return (models.ProductTag.select())
+    '''
+    Get a list with products that belongs to a user
+
+    Arguments:
+    user_id -- integer
+
+    Returns:
+    list of named tuples containing tag_name and product_name.
+    '''
+    query = (models.ProductTag.select(models.Tag.name.alias('tag_name'), models.Product.name.alias('product_name'))
+             .join(models.Tag, on=(models.Tag.id == models.ProductTag.tag_id))
+             .join(models.Product, on=models.Product.id == models.ProductTag.product_id)
+             .where(models.ProductTag.tag_id == tag_id))
+
+    return [item for item in query.dicts()]
 
 
 def add_product_to_catalog(user_id, product):
-    pass
+    query = (models.UserProduct.select(models.UserProduct.product_id)
+             .where(models.UserProduct.user_id == user_id))
+    
+    print([item for item in query.dicts()])
 
 
 def update_stock(product_id, new_quantity):
@@ -37,14 +63,17 @@ def remove_product(product_id):
     pass
 
 if __name__ == "__main__":
-    #result = search("Bloempot")
     print('### STARTING ###')
-    result = list_user_products(1)
+    #result = search("Bloempot")
+    #result = list_user_products(1)
+    #result = list_products_per_tag(1)
+    #result = add_product_to_catalog(1, "TV")
+    add_product_to_catalog(1, "TV")
     
     print('--- PRINTING ---')
     print(result)
     for i in result:
-        print(i.name)
+        print(i)
     print('--- END PRINTING ---')
         
     
