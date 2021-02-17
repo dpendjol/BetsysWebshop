@@ -6,7 +6,9 @@ from peewee import fn
 
 def search(term):
     return ((models.Product.select()
-            .where(fn.Lower(models.Product.name) == fn.Lower(term))).first())
+            .where((fn.Lower(models.Product.name) == fn.Lower(term)) |
+                    fn.Lower(models.Product.description
+                             .contains(fn.Lower(term))))))
 
 
 def list_user_products(user_id):
@@ -116,9 +118,9 @@ if __name__ == "__main__":
     try:
         if result:
             print('--- PRINTING ---')
-            print(result)
+            #print(result)
             for i in result:
-                print(i)
+                print(i.name)
             print('--- END PRINTING ---')
     except NameError:
         print(f"'result' doesn't exists")  
