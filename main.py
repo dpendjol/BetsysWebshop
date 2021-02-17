@@ -90,7 +90,16 @@ def purchase_product(product_id, buyer_id, quantity):
 
 
 def remove_product(product_id):
-    pass
+    '''
+    removes products form userproduct table where product_id = product_id
+    
+    Returns:
+    int -- number of rows affected
+    '''
+    result = (models.UserProduct.delete()
+              .where(models.UserProduct.product_id == product_id)
+              .execute())
+    return result
 
 if __name__ == "__main__":
     print('### STARTING ###')
@@ -100,7 +109,8 @@ if __name__ == "__main__":
     #result = add_product_to_catalog(1, "TV")
     #add_product_to_catalog(1, "TV")
     #update_stock(4, 4)
-    purchase_product(2,8,100)
+    #purchase_product(2,8,100)
+    remove_product(4)
     
     try:
         if result:
