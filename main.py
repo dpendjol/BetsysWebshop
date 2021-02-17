@@ -66,7 +66,11 @@ def add_product_to_catalog(user_id, product):
 
 
 def update_stock(product_id, new_quantity):
-    pass
+    print('updateing stock')
+    result = (models.Product.update(quantity=new_quantity)
+              .where(models.Product.id == product_id)
+              .execute())
+    print('done updating stock', result)
 
 
 def purchase_product(product_id, buyer_id, quantity):
@@ -82,7 +86,8 @@ if __name__ == "__main__":
     #result = list_user_products(1)
     #result = list_products_per_tag(1)
     #result = add_product_to_catalog(1, "TV")
-    add_product_to_catalog(1, "TV")
+    #add_product_to_catalog(1, "TV")
+    update_stock(4, 4)
     
     try:
         if result:
