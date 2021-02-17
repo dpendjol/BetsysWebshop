@@ -41,14 +41,28 @@ def list_products_per_tag(tag_id):
              .join(models.Product, on=models.Product.id == models.ProductTag.product_id)
              .where(models.ProductTag.tag_id == tag_id))
 
+    
     return [item for item in query.dicts()]
 
 
 def add_product_to_catalog(user_id, product):
+    '''
+    Add a product to the Product table if it doesn't exist
+    Add the product ID to to the UserProduct table
+    '''
+    product, create = models.Product.get_or_create(name=product,
+                                                 defaults={'name': product,
+                                                           'description': '',
+                                                           'price': 0,
+                                                           'quantity': 1,
+                                                           })
+    if create:
+        user = models.UserProduct.create(user_id=user_id, product_id=product)
+
     query = (models.UserProduct.select(models.UserProduct.product_id)
              .where(models.UserProduct.user_id == user_id))
     
-    print([item for item in query.dicts()])
+    #print([item for item in query.dicts()])
 
 
 def update_stock(product_id, new_quantity):
@@ -70,12 +84,15 @@ if __name__ == "__main__":
     #result = add_product_to_catalog(1, "TV")
     add_product_to_catalog(1, "TV")
     
-    print('--- PRINTING ---')
-    print(result)
-    for i in result:
-        print(i)
-    print('--- END PRINTING ---')
-        
+    try:
+        if result:
+            print('--- PRINTING ---')
+            print(result)
+            for i in result:
+                print(i)
+            print('--- END PRINTING ---')
+    except NameError:
+        print(f"'result' doesn't exists")  
     
     print('### ENDING ###')
   
