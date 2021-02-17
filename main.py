@@ -66,15 +66,27 @@ def add_product_to_catalog(user_id, product):
 
 
 def update_stock(product_id, new_quantity):
-    print('updateing stock')
+    '''
+    Update quantity at product_id
+    
+    returns number of rows affected. Supposed to be one
+    '''
     result = (models.Product.update(quantity=new_quantity)
               .where(models.Product.id == product_id)
               .execute())
-    print('done updating stock', result)
+    return result
 
 
 def purchase_product(product_id, buyer_id, quantity):
-    pass
+    '''
+    registers a purchase from a product by a buyer
+    
+    Returns:
+    int -- id of inserted row
+    '''
+    result = (models.Purchase.insert(product_id=product_id, user_id=buyer_id, quantity=quantity)
+              .execute())
+    return result
 
 
 def remove_product(product_id):
@@ -87,7 +99,8 @@ if __name__ == "__main__":
     #result = list_products_per_tag(1)
     #result = add_product_to_catalog(1, "TV")
     #add_product_to_catalog(1, "TV")
-    update_stock(4, 4)
+    #update_stock(4, 4)
+    purchase_product(2,8,100)
     
     try:
         if result:
