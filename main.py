@@ -2,10 +2,11 @@ __winc_id__ = "d7b474e9b3a54d23bca54879a4f1855b"
 __human_name__ = "Betsy Webshop"
 
 import models
+from peewee import fn
 
 def search(term):
-    return (models.Product.select()
-            .where(models.Product.name == term))
+    return ((models.Product.select()
+            .where(fn.Lower(models.Product.name) == fn.Lower(term))).first())
 
 
 def list_user_products(user_id):
@@ -103,14 +104,14 @@ def remove_product(product_id):
 
 if __name__ == "__main__":
     print('### STARTING ###')
-    #result = search("Bloempot")
+    result = search("bloempot")
     #result = list_user_products(1)
     #result = list_products_per_tag(1)
     #result = add_product_to_catalog(1, "TV")
     #add_product_to_catalog(1, "TV")
     #update_stock(4, 4)
     #purchase_product(2,8,100)
-    remove_product(4)
+    #remove_product(4)
     
     try:
         if result:
