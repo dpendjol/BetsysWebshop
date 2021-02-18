@@ -2,6 +2,7 @@ __winc_id__ = "d7b474e9b3a54d23bca54879a4f1855b"
 __human_name__ = "Betsy Webshop"
 
 import models
+from models import Product, UserProduct, User, ProductTag
 from peewee import fn
 
 
@@ -17,10 +18,11 @@ def search(term: str):
     Returns:
     peewee.ModelSelect
     '''
-    return ((models.Product.select()
-            .where((fn.Lower(models.Product.name.contains(fn.Lower(term)))) |
-            fn.Lower(models.Product.description
-                     .contains(fn.Lower(term))))))
+    return (Product.select()
+            .where(
+                fn.Lower(Product.name.contains(fn.Lower(term))) |
+                fn.Lower(Product.description.contains(fn.Lower(term)))
+            ))
 
 
 def list_user_products(user_id):
@@ -31,15 +33,14 @@ def list_user_products(user_id):
     user_id -- integer
 
     Returns:
-    list of named tuples Product columns.
+    list of dictionaries -- keys are table column headers
     '''
-    products_query = (models.UserProduct.select(models.Product)
-                      .join(models.Product,
-                            on=(models.UserProduct
-                                .product_id == models.Product.id))
-                      .join(models.User,
-                            on=(models.UserProduct.user_id == models.User.id))
-                      .where(models.UserProduct.user_id == user_id)
+    products_query = (UserProduct.select(Product)
+                      .join(Product,
+                            on=(UserProduct.product_id == Product.id))
+                      .join(User,
+                            on=(UserProduct.user_id == User.id))
+                      .where(UserProduct.user_id == user_id)
                       )
     return [item for item in products_query.dicts()]
 
@@ -52,15 +53,15 @@ def list_products_per_tag(tag_id):
     user_id -- integer
 
     Returns:
-    list of named tuples containing tag_name and product_name.
+    list of dictionaries containing tag_name and product_name.
     '''
-    query = (models.ProductTag.select(models.Tag.name.alias('tag_name'),
-                                      models.Product.name.alias('product_name')
-                                      )
-             .join(models.Tag, on=(models.Tag.id == models.ProductTag.tag_id))
-             .join(models.Product,
-                   on=models.Product.id == models.ProductTag.product_id)
-             .where(models.ProductTag.tag_id == tag_id))
+    query = (ProductTag.select(models.Tag.name.alias('tag_name'),
+                               Product.name.alias('product_name'))
+             .join(models.Tag,
+                   on=(models.Tag.id == ProductTag.tag_id))
+             .join(Product,
+                   on=Product.id == ProductTag.product_id)
+             .where(ProductTag.tag_id == tag_id))
 
     return [item for item in query.dicts()]
 
@@ -78,12 +79,12 @@ def add_product_to_catalog(user_id, product):
     int -- product_id
     '''
 
-    product = models.Product.create(name=product,
-                                    description='',
-                                    price=25.236,
-                                    quantity=1,
-                                    )
-    models.UserProduct.create(user_id=user_id, product_id=product)
+    product = Product.create(name=product,
+                             description='',
+                             price=25.236,
+                             quantity=1,
+                             )
+    UserProduct.create(user_id=user_id, product_id=product)
 
     return product
 
@@ -94,10 +95,9 @@ def update_stock(product_id, new_quantity):
 
     returns number of rows affected. Supposed to be one
     '''
-    result = (models.Product.update(quantity=new_quantity)
-              .where(models.Product.id == product_id)
+    return (Product.update(quantity=new_quantity)
+              .where(Product.id == product_id)
               .execute())
-    return result
 
 
 def purchase_product(product_id, buyer_id, quantity):
@@ -107,10 +107,10 @@ def purchase_product(product_id, buyer_id, quantity):
     Returns:
     int -- id of inserted row
     '''
-    result = (models.Purchase.insert(product_id=product_id, user_id=buyer_id,
-                                     quantity=quantity)
-              .execute())
-    return result
+    return (models.Purchase.insert(product_id=product_id,
+                                   user_id=buyer_id,
+                                   quantity=quantity)
+            .execute())
 
 
 def remove_product(product_id):
@@ -120,10 +120,9 @@ def remove_product(product_id):
     Returns:
     int -- number of rows affected
     '''
-    result = (models.UserProduct.delete()
-              .where(models.UserProduct.product_id == product_id)
+    return (UserProduct.delete()
+              .where(UserProduct.product_id == product_id)
               .execute())
-    return result
 
 
 if __name__ == "__main__":
@@ -131,7 +130,7 @@ if __name__ == "__main__":
     #result = search("bloempot")
     # result = list_products_per_tag(1)
     # result = list_user_products(1)
-    result = add_product_to_catalog(1, "TV")
+    # result = add_product_to_catalog(1, "TV")
     # add_product_to_catalog(1, "TV")
     # update_stock(4, 4)
     # purchase_product(2,8,100)
