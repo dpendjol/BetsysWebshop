@@ -67,7 +67,7 @@ def list_products_per_tag(tag_id):
 
 def add_product_to_catalog(user_id, product):
     '''
-    Add a product to the Product table if it doesn't exist
+    Add a product to the Product table
     Add the product ID to to the UserProduct table
 
     Arguments:
@@ -77,14 +77,13 @@ def add_product_to_catalog(user_id, product):
     Returns:
     int -- product_id
     '''
-    product, create = models.Product.get_or_create(name=product,
-                                                   defaults={'name': product,
-                                                             'description': '',
-                                                             'price': 0,
-                                                             'quantity': 1,
-                                                             })
-    if create:
-        models.UserProduct.create(user_id=user_id, product_id=product)
+
+    product = models.Product.create(name=product,
+                                    description='',
+                                    price=25.236,
+                                    quantity=1,
+                                    )
+    models.UserProduct.create(user_id=user_id, product_id=product)
 
     return product
 
@@ -129,10 +128,10 @@ def remove_product(product_id):
 
 if __name__ == "__main__":
     print('### STARTING ###')
-    result = search("bloempot")
+    #result = search("bloempot")
     # result = list_products_per_tag(1)
     # result = list_user_products(1)
-    # result = add_product_to_catalog(1, "TV")
+    result = add_product_to_catalog(1, "TV")
     # add_product_to_catalog(1, "TV")
     # update_stock(4, 4)
     # purchase_product(2,8,100)

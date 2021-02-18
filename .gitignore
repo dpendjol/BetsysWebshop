@@ -4,3 +4,4 @@ __pycache__/
 new*.py
 mydatabase.db
 test.py
+test.db
