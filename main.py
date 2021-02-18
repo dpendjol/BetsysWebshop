@@ -125,13 +125,26 @@ def remove_product(product_id):
               .execute())
     return result
 
+def did_you_mean(term):
+    '''searches for string that look like term'''
+    p = models.Product
+    query = (p.select(p.name, p.description))
+    words = []
+    for index, value in enumerate(query):
+        words.append(value.name.lower().split(' '))
+        for item in value.description.lower().split(' '):
+            words[index].append(item)
+
+    unique_letters = list(set(term))
+    unique_letters.sort()
+    
 
 if __name__ == "__main__":
     print('### STARTING ###')
     #result = search("bloempot")
     # result = list_products_per_tag(1)
     # result = list_user_products(1)
-    result = add_product_to_catalog(1, "TV")
+    # result = add_product_to_catalog(1, "TV")
     # add_product_to_catalog(1, "TV")
     # update_stock(4, 4)
     # purchase_product(2,8,100)
