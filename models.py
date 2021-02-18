@@ -38,8 +38,8 @@ class Tag(BaseModel):
 
 
 class Product(BaseModel):
-    name = peewee.CharField()
-    description = peewee.CharField()
+    name = peewee.CharField(index=True)
+    description = peewee.CharField(index=True)
     price = peewee.DecimalField(max_digits=10, decimal_places=2,
                                 auto_round=True)  # 00000000.00
     quantity = peewee.IntegerField(constraints=[peewee.Check('quantity >= 0')])
