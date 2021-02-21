@@ -5,3 +5,4 @@ new*.py
 mydatabase.db
 test.py
 test.db
+.DS_Store
