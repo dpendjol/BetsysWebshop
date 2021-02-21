@@ -2,9 +2,70 @@ __winc_id__ = "d7b474e9b3a54d23bca54879a4f1855b"
 __human_name__ = "Betsy Webshop"
 
 import models
+from os import path as ospath
 from models import Product, UserProduct, User, ProductTag
-from peewee import fn
+from peewee import fn, SqliteDatabase
 
+
+def main():
+    new_product = {
+        'name': 'Televisie',
+        'description': 'dit is een nieuw product',
+        'price': 20.20,
+        'quantity': 230.5
+    }
+    
+    print("###", "-"*50, "###\n")
+    
+    result = search("bloempot")
+    print("--> Search for bloempot: ")
+    print("###", "-"*50, "###")
+    for i in result:
+        print(i.name)
+    
+    print("###", "-"*50, "###\n")
+    
+    result = list_products_per_tag(1)
+    print("--> List products of containing tag_id 1:")
+    print("###", "-"*50, "###")
+    for i in result:
+        print(i['name'])
+    
+    print("###", "-"*50, "###\n")
+          
+    result = list_user_products(2)
+    print("--> List products from user with user_id 2:")
+    print("###", "-"*50, "###")
+    for i in result:
+        print(i['name'])
+    
+    print("###", "-"*50, "###\n")
+    
+    result = add_product_to_catalog(1, new_product)
+    print("--> Added a product to the catalog:")
+    print("###", "-"*50, "###")
+    print("Produdct id: ", result)
+    
+    print("###", "-"*50, "###\n")
+    
+    result = update_stock(4, 4)
+    print("--> Change quanty from product 4 to 4")
+    print("###", "-"*50, "###")
+    print("Number of rows affected: ", result)
+    
+    print("###", "-"*50, "###\n")
+    
+    result = purchase_product(2,3,100)
+    print("--> User with id 2 purchased 100 product with id 3")
+    print("###", "-"*50, "###")
+    print("Id of inserted row: ", result)
+    
+    print("###", "-"*50, "###\n")
+    
+    result = remove_product(4)
+    print("--> Remove product with id 4:")
+    print("###", "-"*50, "###")
+    print("Number of rows deleted: ", result)
 
 def search(term: str):
     '''
@@ -56,7 +117,7 @@ def list_products_per_tag(tag_id):
     list of dictionaries containing tag_name and product_name.
     '''
     query = (ProductTag.select(models.Tag.name.alias('tag_name'),
-                               Product.name.alias('product_name'))
+                               Product.name.alias('name'))
              .join(models.Tag,
                    on=(models.Tag.id == ProductTag.tag_id))
              .join(Product,
@@ -129,19 +190,120 @@ def remove_product(product_id):
               .where(UserProduct.product_id == product_id)
               .execute())
 
+def create_tables():
+    db = SqliteDatabase(":memory:", pragmas={'foreign_keys': 1})
+    with db:
+        db.create_tables([models.User,
+                          models.Product,
+                          models.Address,
+                          models.Tag,
+                          models.ProductTag,
+                          models.UserProduct,
+                          models.Purchase,
+                          ])
+
+
+def populate_data():
+    user_data = [
+        ["Henk", "Vriezer", 1, 1],
+        ["Kees", "Herrie", 2, 1],
+        ["Piet", "Oelle", 3, 1],
+    ]
+
+    product_data = [
+        ["Bloempot", "Pot om bloemen in te zetten", 10, 25],
+        ["Kussensloop", "Sloop om kussen te beschermen", 2.5, 10],
+        ["Lamp", "Leuke verlichting voor in huis", 15.5, 15],
+    ]
+
+    address_data = [
+        ["straat 1", 'h1', "1111aa", "city 1", "country 1"],
+        ["straat 2", 'h2', "2222aa", "city 2", "country 2"],
+        ["straat 3", 'h3', "3333aa", "city 3", "country 3"]
+    ]
+
+    tag_data = [
+        ["tag 1"],
+        ["tag 2"],
+        ["tag 3"]
+    ]
+
+    user_product_data = [
+        [1, 1],
+        [1, 2],
+        [2, 2]
+    ]
+
+    transaction_data = [
+        [1, 1, 5],
+        [1, 2, 6],
+        [2, 3, 4]
+    ]
+
+    product_tag_data = [
+        [1, 1],
+        [2, 1],
+        [3, 3]
+    ]
+
+    for item in product_data:
+        Product.create(
+            name=item[0],
+            description=item[1],
+            price=item[2],
+            quantity=item[3]
+        )
+
+    for item in address_data:
+        models.Address.create(
+            street=item[0],
+            number=item[1],
+            zipcode=item[2],
+            city=item[3],
+            country=item[4]
+        )
+
+    for item in user_data:
+        models.User.create(
+            first_name=item[0],
+            last_name=item[1],
+            address=item[2],
+            billing_address=item[3]
+        )
+
+    for item in tag_data:
+        models.Tag.create(
+            name=item[0]
+        )
+
+    for item in transaction_data:
+        models.Purchase.create(
+            user_id=item[0],
+            product_id=item[1],
+            quantity=item[2]
+        )
+
+    for item in user_product_data:
+        models.UserProduct.create(
+            user_id=item[0],
+            product_id=item[1]
+        )
+
+    for item in product_tag_data:
+        models.ProductTag.create(
+            product_id=item[0],
+            tag_id=item[1]
+        )
+
 
 if __name__ == "__main__":    
-    new_product = {
-        'name': 6,
-        'description': 'dit is een nieuw product',
-        'price': 20.20,
-        'quantity': 230.5
-    }
     
-    # result = search("bloempot")
-    # result = list_products_per_tag(1)
-    # result = list_user_products(1)
-    # result = add_product_to_catalog(1, new_product)
-    # result = update_stock(4, 4)
-    # purchase_product(2,8,100)
-    # remove_product(4)
+
+    print("Creating database and tables")
+    create_tables()
+    print("Populating tables")
+    populate_data()
+
+    print("mydatabase.db exists, good to go")
+    
+    main()
