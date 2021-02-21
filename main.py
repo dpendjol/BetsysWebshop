@@ -191,7 +191,7 @@ def remove_product(product_id):
               .execute())
 
 def create_tables():
-    db = SqliteDatabase(":memory", pragmas={'foreign_keys': 1})
+    db = SqliteDatabase(":memory:", pragmas={'foreign_keys': 1})
     with db:
         db.create_tables([models.User,
                           models.Product,
