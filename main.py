@@ -73,27 +73,32 @@ def add_product_to_catalog(user_id, product):
 
     Arguments:
     user_id -- int
-    product -- string
+    product -- dictionary containing keys's:
+               name str
+               description str
+               price float
+               quantity int
 
     Returns:
     int -- product_id
     '''
 
-    product = Product.create(name=product,
-                             description='',
-                             price=25.236,
-                             quantity=1,
+    product = Product.create(name=product['name'],
+                             description=product['description'],
+                             price=product['price'],
+                             quantity=product['quantity'],
                              )
     UserProduct.create(user_id=user_id, product_id=product)
-
-    return product
+    
+    return product.id
 
 
 def update_stock(product_id, new_quantity):
     '''
     Update quantity at product_id
 
-    returns number of rows affected. Supposed to be one
+    Returns 
+    int -- number of rows affected. Supposed to be one
     '''
     return (Product.update(quantity=new_quantity)
               .where(Product.id == product_id)
@@ -125,25 +130,18 @@ def remove_product(product_id):
               .execute())
 
 
-if __name__ == "__main__":
-    print('### STARTING ###')
-    #result = search("bloempot")
+if __name__ == "__main__":    
+    new_product = {
+        'name': 6,
+        'description': 'dit is een nieuw product',
+        'price': 20.20,
+        'quantity': 230.5
+    }
+    
+    # result = search("bloempot")
     # result = list_products_per_tag(1)
     # result = list_user_products(1)
-    # result = add_product_to_catalog(1, "TV")
-    # add_product_to_catalog(1, "TV")
-    # update_stock(4, 4)
+    # result = add_product_to_catalog(1, new_product)
+    # result = update_stock(4, 4)
     # purchase_product(2,8,100)
     # remove_product(4)
-    print(type(result))
-    try:
-        if result:
-            print('--- PRINTING ---')
-            # print(result)
-            for i in result:
-                print(i.name)
-            print('--- END PRINTING ---')
-    except NameError:
-        print("'result' doesn't exists")
-
-    print('### ENDING ###')

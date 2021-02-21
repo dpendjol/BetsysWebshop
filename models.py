@@ -62,12 +62,6 @@ ProductTag = Product.tags.get_through_model()
 
 def create_tables():
     with db:
-        db.drop_tables([User,
-                        Product,
-                        Tag,
-                        ProductTag,
-                        Purchase,
-                        ])
         db.create_tables([User,
                           Product,
                           Address,
