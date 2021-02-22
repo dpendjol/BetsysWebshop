@@ -3,7 +3,7 @@ __human_name__ = "Betsy Webshop"
 
 import models
 from os import path as ospath
-from models import Product, UserProduct, User, ProductTag
+from models import Product, UserProduct, User, ProductTag, Tag
 from peewee import fn, SqliteDatabase
 
 
@@ -12,7 +12,13 @@ def main():
         'name': 'Televisie',
         'description': 'dit is een nieuw product',
         'price': 20.20,
-        'quantity': 230.5
+        'quantity': 230.5,
+        'tags': [
+            'visual',
+            'big screen',
+            'flatscreen',
+            '32inch'
+        ]
     }
     
     print("###", "-"*50, "###\n")
@@ -139,19 +145,28 @@ def add_product_to_catalog(user_id, product):
                description str
                price float
                quantity int
+               tags liust of strings
 
     Returns:
     int -- product_id
     '''
 
-    product = Product.create(name=product['name'],
+    newproduct = Product.create(name=product['name'],
                              description=product['description'],
                              price=product['price'],
                              quantity=product['quantity'],
                              )
-    UserProduct.create(user_id=user_id, product_id=product)
     
-    return product.id
+    tags_to_add = []
+    for tag in product['tags']:
+        newtag, _ = Tag.get_or_create(name=tag)
+        tags_to_add.append(newtag)
+        
+    newproduct.tags.add(tags_to_add)
+    
+    UserProduct.create(user_id=user_id, product_id=newproduct)
+    
+    return newproduct.id
 
 
 def update_stock(product_id, new_quantity):
